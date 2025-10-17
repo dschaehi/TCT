@@ -2,6 +2,11 @@
 """
 generate_feed.py — Unofficial RSS for https://transformer-circuits.pub/
 
+Version 1.7 (fixed UTF-8 encoding)
+-----------------------------------
+- Fixed UTF-8 encoding: server declares ISO-8859-1 but sends UTF-8, now decode from raw bytes
+- Eliminates mojibake characters (â instead of —, etc.) in titles and descriptions
+
 Version 1.6 (fixed missing papers)
 -----------------------------------
 - Fixed discovery to include both .note cards AND .paper links (major research papers)
@@ -43,7 +48,7 @@ from feedgen.feed import FeedGenerator
 
 ORIGIN = "https://transformer-circuits.pub/"
 OUTFILE = "docs/index.xml"
-USER_AGENT = "tc-unofficial-rss/1.6 (+github actions; contact: N/A)"
+USER_AGENT = "tc-unofficial-rss/1.7 (+github actions; contact: N/A)"
 
 # How many items to include at most (set to None to include all found on homepage)
 MAX_ITEMS: Optional[int] = 100
@@ -63,19 +68,16 @@ def get_html(url: str, session: Optional[requests.Session] = None) -> str:
     """Fetch URL and return best-effort UTF-8 text, repairing mojibake if needed."""
     s = session or requests.Session()
     r = s.get(url, headers={"User-Agent": USER_AGENT}, timeout=30)
-    # Prefer UTF-8 but don't trust headers blindly
-    r.encoding = r.encoding or "utf-8"
     r.raise_for_status()
-    html_text = r.text
-
-    # Auto-repair common mojibake: UTF-8 bytes decoded as Latin-1
-    # Heuristic: presence of these sequences suggests mis-decoding
-    if "â€" in html_text or "Ã" in html_text or "â€™" in html_text:
-        try:
-            html_text = html_text.encode("latin1").decode("utf-8")
-        except Exception:
-            # If repair fails, fallback to original
-            pass
+    
+    # The server incorrectly declares ISO-8859-1 but sends UTF-8 content
+    # Always try to decode as UTF-8 from the raw bytes
+    try:
+        html_text = r.content.decode("utf-8")
+    except UnicodeDecodeError:
+        # Fallback to the response's declared encoding
+        r.encoding = r.encoding or "utf-8"
+        html_text = r.text
 
     return html_text
 
