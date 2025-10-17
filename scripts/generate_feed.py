@@ -2,16 +2,11 @@
 """
 generate_feed.py — Build an unofficial RSS feed for https://transformer-circuits.pub/
 
-This version filters out ALL external links (keeps only items hosted on transformer-circuits.pub).
-
-Key features
-------------
-- UTF-8 decoding enforced to avoid mojibake (e.g., em-dash issues).
-- Broader discovery:
-  (1) Card-style posts via `a.note[href]` (title in <h3>, desc in a div containing "description").
-  (2) Year-based internal links via `main a[href^='/20']` for items not wrapped in .note cards.
-- Per-article fetch for pubDate (from meta/time tags or Last-Modified) and optional description.
-- **External links removed**: items whose host is not transformer-circuits.pub are excluded.
+What's new in this version
+--------------------------
+- Decodes HTML entities (e.g., &#8212;) so titles/descriptions render proper punctuation.
+- Normalizes common mojibake sequences (e.g., “â€”” → “—”).
+- Keeps prior improvements: UTF-8 decoding, broader selectors, external-link filtering, per-page pubDate.
 
 Dependencies
 ------------
@@ -27,6 +22,7 @@ from __future__ import annotations
 import os
 import sys
 import time
+import html
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from typing import Optional, Tuple, List
@@ -38,13 +34,39 @@ from feedgen.feed import FeedGenerator
 
 ORIGIN = "https://transformer-circuits.pub/"
 OUTFILE = "docs/index.xml"
-USER_AGENT = "tc-unofficial-rss/1.3 (+github actions; contact: N/A)"
+USER_AGENT = "tc-unofficial-rss/1.4 (+github actions; contact: N/A)"
 
 # How many items to include at most (set to None to include all found on homepage)
 MAX_ITEMS: Optional[int] = 100
 
 # Delay between fetching individual article pages (be polite)
 REQUEST_DELAY_SECONDS = 0.2
+
+
+def fix_mojibake(s: str) -> str:
+    """
+    Normalize common mojibake sequences that sometimes arise from mis-decoding.
+    """
+    if not s:
+        return s
+    return (s
+            .replace("â€”", "—")
+            .replace("â€“", "–")
+            .replace("â€˜", "‘")
+            .replace("â€™", "’")
+            .replace("â€œ", "“")
+            .replace("â€", "”")
+            .replace("â€¦", "…")
+            )
+
+
+def clean_text(s: str) -> str:
+    """
+    HTML-unescape and fix mojibake.
+    """
+    if not s:
+        return s
+    return fix_mojibake(html.unescape(s))
 
 
 def get_html(url: str, session: Optional[requests.Session] = None) -> str:
@@ -170,10 +192,12 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
             continue
 
         title_el = a.select_one("h3")
-        title = title_el.get_text(strip=True) if title_el else url
+        raw_title = title_el.get_text(strip=True) if title_el else url
+        title = clean_text(raw_title)
 
         desc_el = a.select_one("div[class*='description']")
-        description = desc_el.get_text(" ", strip=True) if desc_el else ""
+        raw_desc = desc_el.get_text(" ", strip=True) if desc_el else ""
+        description = clean_text(raw_desc)
 
         items.append((url, title, description))
 
@@ -192,7 +216,8 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
         if any(url == it[0] for it in items):
             continue
 
-        title = a.get_text(" ", strip=True) or url
+        raw_title = a.get_text(" ", strip=True) or url
+        title = clean_text(raw_title)
         description = ""  # We'll try to fetch per-page later
         items.append((url, title, description))
 
@@ -252,7 +277,7 @@ def main() -> None:
             if not description:
                 p = article_soup.find("p")
                 if p:
-                    description = p.get_text(" ", strip=True)[:1000]
+                    description = clean_text(p.get_text(" ", strip=True)[:1000])
         except Exception:
             pub_dt = None
 
@@ -263,6 +288,10 @@ def main() -> None:
         # Fallback to now (UTC)
         if pub_dt is None:
             pub_dt = datetime.now(timezone.utc)
+
+        # Final clean (defensive)
+        title = clean_text(title)
+        description = clean_text(description)
 
         fe = fg.add_entry()
         fe.id(url)
