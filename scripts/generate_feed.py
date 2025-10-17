@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
-generate_feed.py — Build an unofficial RSS feed for https://transformer-circuits.pub/
+generate_feed.py — Unofficial RSS for https://transformer-circuits.pub/
 
-What's new in this version
---------------------------
-- Decodes HTML entities (e.g., &#8212;) so titles/descriptions render proper punctuation.
-- Normalizes common mojibake sequences (e.g., “â€”” → “—”).
-- Keeps prior improvements: UTF-8 decoding, broader selectors, external-link filtering, per-page pubDate.
+Version 1.5 (final fixes)
+-------------------------
+- Robust UTF-8 repair: if the response shows mojibake (e.g., “â€””, “â€™”), re-decode as latin1->utf-8.
+- HTML entity decoding for clean punctuation.
+- External links filtered (keep only transformer-circuits.pub).
+- Wider item discovery (.note cards + year-based links under <main>).
+- Per-article date via meta/time or Last-Modified (fallback now UTC).
 
 Dependencies
 ------------
@@ -34,7 +36,7 @@ from feedgen.feed import FeedGenerator
 
 ORIGIN = "https://transformer-circuits.pub/"
 OUTFILE = "docs/index.xml"
-USER_AGENT = "tc-unofficial-rss/1.4 (+github actions; contact: N/A)"
+USER_AGENT = "tc-unofficial-rss/1.5 (+github actions; contact: N/A)"
 
 # How many items to include at most (set to None to include all found on homepage)
 MAX_ITEMS: Optional[int] = 100
@@ -43,39 +45,32 @@ MAX_ITEMS: Optional[int] = 100
 REQUEST_DELAY_SECONDS = 0.2
 
 
-def fix_mojibake(s: str) -> str:
-    """
-    Normalize common mojibake sequences that sometimes arise from mis-decoding.
-    """
-    if not s:
-        return s
-    return (s
-            .replace("â€”", "—")
-            .replace("â€“", "–")
-            .replace("â€˜", "‘")
-            .replace("â€™", "’")
-            .replace("â€œ", "“")
-            .replace("â€", "”")
-            .replace("â€¦", "…")
-            )
-
-
 def clean_text(s: str) -> str:
-    """
-    HTML-unescape and fix mojibake.
-    """
+    """HTML-unescape and strip."""
     if not s:
         return s
-    return fix_mojibake(html.unescape(s))
+    return html.unescape(s).strip()
 
 
 def get_html(url: str, session: Optional[requests.Session] = None) -> str:
+    """Fetch URL and return best-effort UTF-8 text, repairing mojibake if needed."""
     s = session or requests.Session()
     r = s.get(url, headers={"User-Agent": USER_AGENT}, timeout=30)
-    # Ensure correct decoding to avoid mojibake (e.g., em-dashes)
-    r.encoding = "utf-8"
+    # Prefer UTF-8 but don't trust headers blindly
+    r.encoding = r.encoding or "utf-8"
     r.raise_for_status()
-    return r.text
+    html_text = r.text
+
+    # Auto-repair common mojibake: UTF-8 bytes decoded as Latin-1
+    # Heuristic: presence of these sequences suggests mis-decoding
+    if "â€" in html_text or "Ã" in html_text or "â€™" in html_text:
+        try:
+            html_text = html_text.encode("latin1").decode("utf-8")
+        except Exception:
+            # If repair fails, fallback to original
+            pass
+
+    return html_text
 
 
 def get_head_last_modified(url: str, session: Optional[requests.Session] = None) -> Optional[datetime]:
@@ -99,10 +94,7 @@ def get_head_last_modified(url: str, session: Optional[requests.Session] = None)
 
 
 def extract_meta_datetime(soup: BeautifulSoup) -> Optional[datetime]:
-    """
-    Try to extract a publication datetime from common meta/time tags, return tz-aware UTC.
-    """
-    # <meta property="article:published_time" content="2025-09-10T12:34:56Z">
+    """Try to extract a publication datetime from common meta/time tags and return tz-aware UTC."""
     candidates = [
         ("meta", {"property": "article:published_time"}),
         ("meta", {"name": "pubdate"}),
@@ -117,7 +109,6 @@ def extract_meta_datetime(soup: BeautifulSoup) -> Optional[datetime]:
             if dt:
                 return dt
 
-    # <time datetime="...">
     t = soup.find("time", attrs={"datetime": True})
     if t:
         dt = _parse_to_aware_dt(t["datetime"])
@@ -128,10 +119,7 @@ def extract_meta_datetime(soup: BeautifulSoup) -> Optional[datetime]:
 
 
 def _parse_to_aware_dt(dt_str: str) -> Optional[datetime]:
-    """
-    Parse ISO 8601 or RFC-2822-ish into tz-aware UTC datetime.
-    """
-    # Try RFC 2822 via email.utils first
+    """Parse ISO 8601 or RFC-2822 into tz-aware UTC datetime."""
     try:
         dt = parsedate_to_datetime(dt_str)
         if dt:
@@ -143,9 +131,7 @@ def _parse_to_aware_dt(dt_str: str) -> Optional[datetime]:
     except Exception:
         pass
 
-    # Then try ISO 8601
     try:
-        # Normalize trailing Z
         iso = dt_str.replace("Z", "+00:00")
         dt = datetime.fromisoformat(iso)
         if dt.tzinfo is None:
@@ -169,14 +155,13 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
     Return a list of (url, title, description) found on the homepage.
 
     Strategy:
-      1) Card-style notes (.note) per FiveFilters:
+      1) Card-style notes (.note):
          - Item: a.note[href]
          - Title: h3
          - Description: div[class*='description']
       2) Year-based internal links in the main content:
-         - main a[href^='/20']  (these often lack the .note wrapper)
-
-    External links are filtered out (only keep transformer-circuits.pub).
+         - main a[href^='/20']
+    External links are filtered out (keep only transformer-circuits.pub).
     """
     items: List[Tuple[str, str, str]] = []
 
@@ -186,8 +171,6 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
         if not href:
             continue
         url = urljoin(ORIGIN, href)
-
-        # Skip external links
         if not _same_host(url):
             continue
 
@@ -207,8 +190,6 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
         if not href:
             continue
         url = urljoin(ORIGIN, href)
-
-        # Skip external links (shouldn't happen with ^='/20', but keep safety)
         if not _same_host(url):
             continue
 
@@ -258,8 +239,10 @@ def main() -> None:
     fg.lastBuildDate(datetime.now(timezone.utc))  # tz-aware
 
     count = 0
+    # Optional: collect entries to sort newest-first
+    entries: List[Tuple[str, str, str, datetime]] = []
+
     for (url, title, description) in items:
-        # Extra safety: only process same-host URLs
         if not _same_host(url):
             continue
 
@@ -289,10 +272,14 @@ def main() -> None:
         if pub_dt is None:
             pub_dt = datetime.now(timezone.utc)
 
-        # Final clean (defensive)
-        title = clean_text(title)
-        description = clean_text(description)
+        entries.append((url, clean_text(title), clean_text(description), pub_dt))
+        count += 1
+        time.sleep(REQUEST_DELAY_SECONDS)
 
+    # Sort newest first (optional, but nice for readers)
+    entries.sort(key=lambda x: x[3], reverse=True)
+
+    for url, title, description, pub_dt in entries:
         fe = fg.add_entry()
         fe.id(url)
         fe.link(href=url)
@@ -300,10 +287,6 @@ def main() -> None:
         if description:
             fe.description(description)
         fe.pubDate(pub_dt)
-
-        count += 1
-        # Be polite
-        time.sleep(REQUEST_DELAY_SECONDS)
 
     fg.rss_file(OUTFILE, pretty=True)
     print(f"Wrote {OUTFILE} with {count} items.")
