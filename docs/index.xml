@@ -7,7 +7,18 @@
     <docs>http://www.rssboard.org/rss-specification</docs>
     <generator>python-feedgen</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 17 Oct 2025 06:14:14 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 17 Oct 2025 06:38:20 +0000</lastBuildDate>
+    <item>
+      <title>Superposition, Memorization, and Double Descent Henighan et al., 2023</title>
+      <link>https://transformer-circuits.pub/2023/toy-double-descent/index.html</link>
+      <description>We have little mechanistic understanding of how deep learning
+                    models overfit to their training data, despite it being a
+                    central problem. Here we extend our previous work on toy models
+                    to shed light on how models generalize beyond their training
+                    data.</description>
+      <guid isPermaLink="false">https://transformer-circuits.pub/2023/toy-double-descent/index.html</guid>
+      <pubDate>Wed, 24 May 2023 23:00:47 +0000</pubDate>
+    </item>
     <item>
       <title>Exercises</title>
       <link>https://transformer-circuits.pub/2021/exercises/index.html</link>
@@ -15,6 +26,14 @@
                     networks implement algorithms at the parameter level.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2021/exercises/index.html</guid>
       <pubDate>Mon, 10 Jun 2024 05:29:37 +0000</pubDate>
+    </item>
+    <item>
+      <title>A Mathematical Framework for Transformer Circuits Elhage et al., 2021</title>
+      <link>https://transformer-circuits.pub/2021/framework/index.html</link>
+      <description>Our early mathematical framework for reverse engineering models,
+                    demonstrated by reverse engineering small toy models. paper</description>
+      <guid isPermaLink="false">https://transformer-circuits.pub/2021/framework/index.html</guid>
+      <pubDate>Mon, 10 Jun 2024 05:29:39 +0000</pubDate>
     </item>
     <item>
       <title>Garcon</title>
@@ -32,6 +51,15 @@
       <pubDate>Mon, 10 Jun 2024 05:29:40 +0000</pubDate>
     </item>
     <item>
+      <title>In-Context Learning and Induction Heads Olsson et al., 2022</title>
+      <link>https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html</link>
+      <description>An exploration of the hypothesis that induction heads are the primary
+                    mechanism behind in-context learning. We also report the existence of a previously unknown phase
+                    change in transformers language models. paper</description>
+      <guid isPermaLink="false">https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html</guid>
+      <pubDate>Mon, 10 Jun 2024 05:30:03 +0000</pubDate>
+    </item>
+    <item>
       <title>Mechanistic Interpretability, Variables, and the Importance of Interpretable Bases</title>
       <link>https://transformer-circuits.pub/2022/mech-interp-essay/index.html</link>
       <description>An informal note on intuitions related to mechanistic interpretability.</description>
@@ -47,6 +75,15 @@
       <pubDate>Mon, 10 Jun 2024 05:30:05 +0000</pubDate>
     </item>
     <item>
+      <title>Toy Models of Superposition Elhage et al., 2022</title>
+      <link>https://transformer-circuits.pub/2022/toy_model/index.html</link>
+      <description>Neural networks often seem to pack many unrelated concepts into a single
+                    neuron - a puzzling phenomenon known as 'polysemanticity'. In our latest interpretability work,
+                    we build toy models where the origins and dynamics of polysemanticity can be fully understood.</description>
+      <guid isPermaLink="false">https://transformer-circuits.pub/2022/toy_model/index.html</guid>
+      <pubDate>Mon, 10 Jun 2024 05:30:06 +0000</pubDate>
+    </item>
+    <item>
       <title>Interpretability Dreams</title>
       <link>https://transformer-circuits.pub/2023/interpretability-dreams/index.html</link>
       <description>Our present research aims to create a foundation for mechanistic
@@ -54,6 +91,14 @@
                     the foundations for.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2023/interpretability-dreams/index.html</guid>
       <pubDate>Mon, 10 Jun 2024 05:30:06 +0000</pubDate>
+    </item>
+    <item>
+      <title>Towards Monosemanticity: Decomposing Language Models With Dictionary Learning Bricken et al., 2023</title>
+      <link>https://transformer-circuits.pub/2023/monosemantic-features/index.html</link>
+      <description>Using a sparse autoencoder, we extract a large number of interpretable features from a one-layer
+                    transformer.</description>
+      <guid isPermaLink="false">https://transformer-circuits.pub/2023/monosemantic-features/index.html</guid>
+      <pubDate>Mon, 10 Jun 2024 05:30:07 +0000</pubDate>
     </item>
     <item>
       <title>Circuits Updates â May 2023</title>
@@ -190,11 +235,35 @@
       <pubDate>Wed, 19 Mar 2025 18:13:33 +0000</pubDate>
     </item>
     <item>
+      <title>Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet Templeton et al., 2024</title>
+      <link>https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html</link>
+      <description>Using a sparse autoencoder, we extract a large number of interpretable features from Claude 3
+                    Sonnet. Some appear to be safety-relevant.</description>
+      <guid isPermaLink="false">https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html</guid>
+      <pubDate>Tue, 25 Mar 2025 21:50:57 +0000</pubDate>
+    </item>
+    <item>
       <title>Progress on Attention</title>
       <link>https://transformer-circuits.pub/2025/attention-update/index.html</link>
       <description>An update on our progress studying attention.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2025/attention-update/index.html</guid>
       <pubDate>Tue, 29 Apr 2025 14:34:48 +0000</pubDate>
+    </item>
+    <item>
+      <title>On the Biology of a Large Language Model Lindsey et al., 2025</title>
+      <link>https://transformer-circuits.pub/2025/attribution-graphs/biology.html</link>
+      <description>We investigate the internal mechanisms used by Claude 3.5 Haiku â Anthropic's lightweight
+                    production model â in a variety of contexts.</description>
+      <guid isPermaLink="false">https://transformer-circuits.pub/2025/attribution-graphs/biology.html</guid>
+      <pubDate>Wed, 07 May 2025 15:58:35 +0000</pubDate>
+    </item>
+    <item>
+      <title>Circuit Tracing: Revealing Computational Graphs in Language Models Ameisen et al., 2025</title>
+      <link>https://transformer-circuits.pub/2025/attribution-graphs/methods.html</link>
+      <description>We describe an approach to tracing the "step-by-step" computation involved when a model responds
+                    to a single prompt.</description>
+      <guid isPermaLink="false">https://transformer-circuits.pub/2025/attribution-graphs/methods.html</guid>
+      <pubDate>Wed, 07 May 2025 15:58:36 +0000</pubDate>
     </item>
     <item>
       <title>Circuits Updates â April 2025</title>
@@ -216,6 +285,14 @@
       <description>Unpacking "interference weights" in some more depth.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2025/interference-weights/index.html</guid>
       <pubDate>Wed, 30 Jul 2025 19:05:47 +0000</pubDate>
+    </item>
+    <item>
+      <title>Tracing Attention Computation Through Feature Interactions Kamath et al., 2025</title>
+      <link>https://transformer-circuits.pub/2025/attention-qk/index.html</link>
+      <description>We describe and apply a method to explain attention patterns in terms of
+                    feature interactions, and integrate this information into attribution graphs.</description>
+      <guid isPermaLink="false">https://transformer-circuits.pub/2025/attention-qk/index.html</guid>
+      <pubDate>Mon, 04 Aug 2025 17:30:44 +0000</pubDate>
     </item>
     <item>
       <title>Circuits Updates â July 2025</title>
