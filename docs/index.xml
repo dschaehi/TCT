@@ -7,21 +7,13 @@
     <docs>http://www.rssboard.org/rss-specification</docs>
     <generator>python-feedgen</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 17 Oct 2025 05:42:58 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 17 Oct 2025 05:56:30 +0000</lastBuildDate>
     <item>
       <title>Garcon</title>
       <link>https://transformer-circuits.pub/2021/garcon/index.html</link>
       <description>A description of our tooling for doing interpretability on large models.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2021/garcon/index.html</guid>
       <pubDate>Mon, 10 Jun 2024 05:29:40 +0000</pubDate>
-    </item>
-    <item>
-      <title>PySvelte</title>
-      <link>https://github.com/anthropics/PySvelte</link>
-      <description>One approach to bridging Python and web-based interactive diagrams for
-                    interpretability research.</description>
-      <guid isPermaLink="false">https://github.com/anthropics/PySvelte</guid>
-      <pubDate>Fri, 17 Oct 2025 05:43:15 +0000</pubDate>
     </item>
     <item>
       <title>Videos</title>
@@ -69,7 +61,7 @@
       <title>Distributed Representations: Composition &amp; Superposition</title>
       <link>https://transformer-circuits.pub/2023/superposition-composition/index.html</link>
       <description>An informal note on how "distributed representations" might be understood
-                    as two different, competing strategies â "composition" and "superposition" â with quite
+                    as two different, competing strategies — "composition" and "superposition" — with quite
                     different properties.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2023/superposition-composition/index.html</guid>
       <pubDate>Tue, 11 Jun 2024 20:27:04 +0000</pubDate>
@@ -84,28 +76,28 @@
       <pubDate>Mon, 10 Jun 2024 05:30:06 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â May 2023</title>
+      <title>Circuits Updates — May 2023</title>
       <link>https://transformer-circuits.pub/2023/may-update/index.html</link>
       <description>A collection of small updates from the Anthropic Interpretability Team.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2023/may-update/index.html</guid>
       <pubDate>Mon, 10 Jun 2024 05:30:07 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â July 2023</title>
+      <title>Circuits Updates — July 2023</title>
       <link>https://transformer-circuits.pub/2023/july-update/index.html</link>
       <description>A collection of small updates from the Anthropic Interpretability Team.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2023/july-update/index.html</guid>
       <pubDate>Mon, 10 Jun 2024 05:30:07 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â January 2024</title>
+      <title>Circuits Updates — January 2024</title>
       <link>https://transformer-circuits.pub/2024/jan-update/index.html</link>
       <description>A collection of small updates from the Anthropic Interpretability Team.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2024/jan-update/index.html</guid>
       <pubDate>Mon, 10 Jun 2024 05:44:38 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â February 2024</title>
+      <title>Circuits Updates — February 2024</title>
       <link>https://transformer-circuits.pub/2024/feb-update/index.html</link>
       <description>A collection of small updates from the Anthropic Interpretability Team.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2024/feb-update/index.html</guid>
@@ -120,28 +112,28 @@
       <pubDate>Mon, 10 Jun 2024 05:44:38 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â March 2024</title>
+      <title>Circuits Updates — March 2024</title>
       <link>https://transformer-circuits.pub/2024/march-update/index.html</link>
       <description>A collection of small updates from the Anthropic Interpretability Team.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2024/march-update/index.html</guid>
       <pubDate>Mon, 10 Jun 2024 05:44:38 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â April 2024</title>
+      <title>Circuits Updates — April 2024</title>
       <link>https://transformer-circuits.pub/2024/april-update/index.html</link>
       <description>A collection of small updates from the Anthropic Interpretability Team.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2024/april-update/index.html</guid>
       <pubDate>Thu, 05 Sep 2024 23:58:57 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â June 2024</title>
+      <title>Circuits Updates — June 2024</title>
       <link>https://transformer-circuits.pub/2024/june-update/index.html</link>
       <description>A collection of small updates: topk and gated SAE investigation.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2024/june-update/index.html</guid>
       <pubDate>Thu, 05 Sep 2024 23:59:16 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â July 2024</title>
+      <title>Circuits Updates — July 2024</title>
       <link>https://transformer-circuits.pub/2024/july-update/index.html</link>
       <description>A collection of small updates: five hurdles, linear representations, dark matter, pivot tables,
                     feature sensitivity.</description>
@@ -149,14 +141,14 @@
       <pubDate>Fri, 06 Sep 2024 00:02:27 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â August 2024</title>
+      <title>Circuits Updates — August 2024</title>
       <link>https://transformer-circuits.pub/2024/august-update/index.html</link>
       <description>A collection of small updates: interpretability evals, reproducing self-explanation.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2024/august-update/index.html</guid>
       <pubDate>Mon, 27 Jan 2025 20:09:40 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â September 2024</title>
+      <title>Circuits Updates — September 2024</title>
       <link>https://transformer-circuits.pub/2024/september-update/index.html</link>
       <description>A collection of small updates: investigating successor heads, oversampling data in SAEs.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2024/september-update/index.html</guid>
@@ -184,7 +176,7 @@
       <pubDate>Tue, 17 Dec 2024 05:08:06 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â January 2025</title>
+      <title>Circuits Updates — January 2025</title>
       <link>https://transformer-circuits.pub/2025/january-update/index.html</link>
       <description>A collection of small updates: dictionary learning optimization techniques.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2025/january-update/index.html</guid>
@@ -205,22 +197,14 @@
       <pubDate>Tue, 29 Apr 2025 14:34:48 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â April 2025</title>
+      <title>Circuits Updates — April 2025</title>
       <link>https://transformer-circuits.pub/2025/april-update/index.html</link>
       <description>A collection of small updates: jailbreaks, dense features, and spinning up on interpretability.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2025/april-update/index.html</guid>
       <pubDate>Tue, 13 May 2025 19:51:58 +0000</pubDate>
     </item>
     <item>
-      <title>Automated Auditing</title>
-      <link>https://alignment.anthropic.com/2025/automated-auditing/</link>
-      <description>A note on using agents to perform automated alignment audits, including using interpretability
-                    tools.</description>
-      <guid isPermaLink="false">https://alignment.anthropic.com/2025/automated-auditing/</guid>
-      <pubDate>Fri, 17 Oct 2025 05:43:01 +0000</pubDate>
-    </item>
-    <item>
-      <title>Circuits Updates â July 2025</title>
+      <title>Circuits Updates — July 2025</title>
       <link>https://transformer-circuits.pub/2025/july-update/index.html</link>
       <description>A collection of small updates: revisiting A Mathematical Framework and applications of
                     interpretability to biology.</description>
@@ -249,14 +233,14 @@
       <pubDate>Thu, 07 Aug 2025 20:27:18 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â August 2025</title>
+      <title>Circuits Updates — August 2025</title>
       <link>https://transformer-circuits.pub/2025/august-update/index.html</link>
-      <description>A small update: How does a persona modify the assistantâs response?</description>
+      <description>A small update: How does a persona modify the assistant’s response?</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2025/august-update/index.html</guid>
       <pubDate>Thu, 28 Aug 2025 21:02:20 +0000</pubDate>
     </item>
     <item>
-      <title>Circuits Updates â September 2025</title>
+      <title>Circuits Updates — September 2025</title>
       <link>https://transformer-circuits.pub/2025/september-update/index.html</link>
       <description>A small update on features and in-context learning.</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2025/september-update/index.html</guid>
