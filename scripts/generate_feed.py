@@ -2,9 +2,15 @@
 """
 generate_feed.py — Unofficial RSS for https://transformer-circuits.pub/
 
-Version 1.5 (final fixes)
--------------------------
-- Robust UTF-8 repair: if the response shows mojibake (e.g., “â€””, “â€™”), re-decode as latin1->utf-8.
+Version 1.6 (fixed missing papers)
+-----------------------------------
+- Fixed discovery to include both .note cards AND .paper links (major research papers)
+- Improved title/description parsing for .paper elements using regex to find author citations
+- Now captures all 40+ articles from the homepage instead of just ~32
+
+Version 1.5 (previous)
+----------------------
+- Robust UTF-8 repair: if the response shows mojibake (e.g., "â€"", "â€™"), re-decode as latin1->utf-8.
 - HTML entity decoding for clean punctuation.
 - External links filtered (keep only transformer-circuits.pub).
 - Wider item discovery (.note cards + year-based links under <main>).
@@ -22,6 +28,7 @@ python scripts/generate_feed.py
 from __future__ import annotations
 
 import os
+import re
 import sys
 import time
 import html
@@ -36,7 +43,7 @@ from feedgen.feed import FeedGenerator
 
 ORIGIN = "https://transformer-circuits.pub/"
 OUTFILE = "docs/index.xml"
-USER_AGENT = "tc-unofficial-rss/1.5 (+github actions; contact: N/A)"
+USER_AGENT = "tc-unofficial-rss/1.6 (+github actions; contact: N/A)"
 
 # How many items to include at most (set to None to include all found on homepage)
 MAX_ITEMS: Optional[int] = 100
@@ -159,8 +166,10 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
          - Item: a.note[href]
          - Title: h3
          - Description: div[class*='description']
-      2) Year-based internal links in the main content:
-         - main a[href^='/20']
+      2) Major research papers (.paper):
+         - Item: a.paper[href]
+         - Title: text content (usually contains title + authors + year + description)
+         - Description: parsed from the link text
     External links are filtered out (keep only transformer-circuits.pub).
     """
     items: List[Tuple[str, str, str]] = []
@@ -184,8 +193,8 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
 
         items.append((url, title, description))
 
-    # 2) Year-based internal links under main
-    for a in home_soup.select("main a[href^='/20']"):
+    # 2) Major research papers (.paper class)
+    for a in home_soup.select("a.paper[href]"):
         href = a.get("href", "").strip()
         if not href:
             continue
@@ -197,9 +206,32 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
         if any(url == it[0] for it in items):
             continue
 
-        raw_title = a.get_text(" ", strip=True) or url
-        title = clean_text(raw_title)
-        description = ""  # We'll try to fetch per-page later
+        # Parse the text content - typically: "Title Authors et al., Year Description..."
+        raw_text = a.get_text(" ", strip=True)
+        
+        # Try to extract title and description
+        # Pattern: "Title Author1 et al., YYYY Description..."
+        # Strategy: Find "et al., YYYY" pattern to split title from description
+        
+        # Look for author citation pattern: "Name et al., YYYY"
+        match = re.search(r'\b\w+\s+et\s+al\.,?\s+\d{4}\b', raw_text)
+        if match:
+            # Split at the end of the citation
+            split_pos = match.end()
+            title = clean_text(raw_text[:split_pos])
+            description = clean_text(raw_text[split_pos:])
+        else:
+            # Fallback: use first sentence or whole text as title
+            # Look for first sentence ending
+            sentence_end = re.search(r'\.\s+[A-Z]', raw_text)
+            if sentence_end and sentence_end.start() < 150:
+                title = clean_text(raw_text[:sentence_end.start() + 1])
+                description = clean_text(raw_text[sentence_end.end() - 1:])
+            else:
+                # Just use whole text as title, fetch description from article page later
+                title = clean_text(raw_text)
+                description = ""
+
         items.append((url, title, description))
 
     # Deduplicate while preserving order
