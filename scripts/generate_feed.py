@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-import re, sys, time
+import re
+import sys
+import time
 from datetime import datetime, timezone
 from urllib.parse import urljoin
 
@@ -115,7 +117,8 @@ def main():
         "Unofficial RSS feed generated from the homepage of transformer-circuits.pub"
     )
     fg.language("en")
-    fg.lastBuildDate(datetime.utcnow())
+
+    fg.lastBuildDate(datetime.now(timezone.utc))
 
     session = requests.Session()
     session.headers.update({"User-Agent": USER_AGENT})
