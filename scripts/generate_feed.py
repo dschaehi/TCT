@@ -152,11 +152,17 @@ def _parse_to_aware_dt(dt_str: str) -> Optional[datetime]:
         return None
 
 
-def _same_host(url: str, origin: str = ORIGIN) -> bool:
+ALLOWED_HOSTS = {
+    urlparse(ORIGIN).netloc,
+    "alignment.anthropic.com",
+}
+
+
+def _allowed_host(url: str) -> bool:
     parsed = urlparse(url)
     if not parsed.netloc:
         return True  # relative to origin
-    return parsed.netloc == urlparse(origin).netloc
+    return parsed.netloc in ALLOWED_HOSTS
 
 
 def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
@@ -172,7 +178,7 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
          - Item: a.paper[href]
          - Title: text content (usually contains title + authors + year + description)
          - Description: parsed from the link text
-    External links are filtered out (keep only transformer-circuits.pub).
+    External links are filtered out (keep only transformer-circuits.pub and alignment.anthropic.com).
     """
     items: List[Tuple[str, str, str]] = []
 
@@ -182,7 +188,7 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
         if not href:
             continue
         url = urljoin(ORIGIN, href)
-        if not _same_host(url):
+        if not _allowed_host(url):
             continue
 
         title_el = a.select_one("h3")
@@ -201,7 +207,7 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
         if not href:
             continue
         url = urljoin(ORIGIN, href)
-        if not _same_host(url):
+        if not _allowed_host(url):
             continue
 
         # Skip if already captured by .note
@@ -277,7 +283,7 @@ def main() -> None:
     entries: List[Tuple[str, str, str, datetime]] = []
 
     for (url, title, description) in items:
-        if not _same_host(url):
+        if not _allowed_host(url):
             continue
 
         pub_dt = None

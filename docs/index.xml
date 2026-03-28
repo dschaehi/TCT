@@ -7,7 +7,7 @@
     <docs>http://www.rssboard.org/rss-specification</docs>
     <generator>python-feedgen</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 28 Mar 2026 07:13:41 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 28 Mar 2026 18:09:31 +0000</lastBuildDate>
     <item>
       <title>Superposition, Memorization, and Double Descent Henighan et al., 2023</title>
       <link>https://transformer-circuits.pub/2023/toy-double-descent/index.html</link>
@@ -350,6 +350,21 @@
       <description>--&gt;</description>
       <guid isPermaLink="false">https://transformer-circuits.pub/2025/introspection/index.html</guid>
       <pubDate>Fri, 02 Jan 2026 08:15:55 +0000</pubDate>
+    </item>
+    <item>
+      <title>Circuits Cross-Post — Activation Oracles</title>
+      <link>https://alignment.anthropic.com/2025/activation-oracles</link>
+      <description>We train language models to answer questions about their own activations in natural language.</description>
+      <guid isPermaLink="false">https://alignment.anthropic.com/2025/activation-oracles</guid>
+      <pubDate>Sat, 28 Mar 2026 18:09:32 +0000</pubDate>
+    </item>
+    <item>
+      <title>Automated Auditing</title>
+      <link>https://alignment.anthropic.com/2025/automated-auditing/</link>
+      <description>A note on using agents to perform automated alignment audits, including using interpretability
+                    tools.</description>
+      <guid isPermaLink="false">https://alignment.anthropic.com/2025/automated-auditing/</guid>
+      <pubDate>Sat, 28 Mar 2026 18:09:40 +0000</pubDate>
     </item>
   </channel>
 </rss>
