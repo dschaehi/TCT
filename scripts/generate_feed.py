@@ -2,6 +2,15 @@
 """
 generate_feed.py — Unofficial RSS for https://transformer-circuits.pub/
 
+Version 1.8 (fixed RSS item order and stable homepage date fallback)
+-----------------------------------
+- Fixed item ordering: feedgen prepends entries, so entries are now inserted
+  oldest-first to produce newest-first RSS output.
+- Uses homepage month/year headings as a stable fallback when article pages
+  do not expose metadata or Last-Modified.
+- Parses .paper titles from structured h3/byline/description elements before
+  falling back to text regexes.
+
 Version 1.7 (fixed UTF-8 encoding)
 -----------------------------------
 - Fixed UTF-8 encoding: server declares ISO-8859-1 but sends UTF-8, now decode from raw bytes
@@ -48,7 +57,7 @@ from feedgen.feed import FeedGenerator
 
 ORIGIN = "https://transformer-circuits.pub/"
 OUTFILE = "docs/index.xml"
-USER_AGENT = "tc-unofficial-rss/1.7 (+github actions; contact: N/A)"
+USER_AGENT = "tc-unofficial-rss/1.8 (+github actions; contact: N/A)"
 
 # How many items to include at most (set to None to include all found on homepage)
 MAX_ITEMS: Optional[int] = 100
@@ -165,9 +174,47 @@ def _allowed_host(url: str) -> bool:
     return parsed.netloc in ALLOWED_HOSTS
 
 
-def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
+FeedItem = Tuple[str, str, str, Optional[datetime]]
+
+MONTHS = {
+    "January": 1,
+    "February": 2,
+    "March": 3,
+    "April": 4,
+    "May": 5,
+    "June": 6,
+    "July": 7,
+    "August": 8,
+    "September": 9,
+    "October": 10,
+    "November": 11,
+    "December": 12,
+}
+
+
+def extract_homepage_month_datetime(item_el) -> Optional[datetime]:
+    """Return the month/year heading above a homepage item as UTC midnight."""
+    date_el = item_el.find_previous("div", class_="date")
+    if not date_el:
+        return None
+
+    date_text = date_el.get_text(" ", strip=True)
+    match = re.search(
+        r"\b("
+        + "|".join(MONTHS)
+        + r")\s+(\d{4})\b",
+        date_text,
+    )
+    if not match:
+        return None
+
+    month_name, year = match.groups()
+    return datetime(int(year), MONTHS[month_name], 1, tzinfo=timezone.utc)
+
+
+def collect_home_items(home_soup: BeautifulSoup) -> List[FeedItem]:
     """
-    Return a list of (url, title, description) found on the homepage.
+    Return a list of (url, title, description, homepage_dt) found on the homepage.
 
     Strategy:
       1) Card-style notes (.note):
@@ -180,7 +227,7 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
          - Description: parsed from the link text
     External links are filtered out (keep only transformer-circuits.pub and alignment.anthropic.com).
     """
-    items: List[Tuple[str, str, str]] = []
+    items: List[FeedItem] = []
 
     # 1) .note cards
     for a in home_soup.select("a.note[href]"):
@@ -199,7 +246,7 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
         raw_desc = desc_el.get_text(" ", strip=True) if desc_el else ""
         description = clean_text(raw_desc)
 
-        items.append((url, title, description))
+        items.append((url, title, description, extract_homepage_month_datetime(a)))
 
     # 2) Major research papers (.paper class)
     for a in home_soup.select("a.paper[href]"):
@@ -214,42 +261,44 @@ def collect_home_items(home_soup: BeautifulSoup) -> List[Tuple[str, str, str]]:
         if any(url == it[0] for it in items):
             continue
 
-        # Parse the text content - typically: "Title Authors et al., Year Description..."
-        raw_text = a.get_text(" ", strip=True)
-        
-        # Try to extract title and description
-        # Pattern: "Title Author1 et al., YYYY Description..."
-        # Strategy: Find "et al., YYYY" pattern to split title from description
-        
-        # Look for author citation pattern: "Name et al., YYYY"
-        match = re.search(r'\b\w+\s+et\s+al\.,?\s+\d{4}\b', raw_text)
-        if match:
-            # Split at the end of the citation
-            split_pos = match.end()
-            title = clean_text(raw_text[:split_pos])
-            description = clean_text(raw_text[split_pos:])
-        else:
-            # Fallback: use first sentence or whole text as title
-            # Look for first sentence ending
-            sentence_end = re.search(r'\.\s+[A-Z]', raw_text)
-            if sentence_end and sentence_end.start() < 150:
-                title = clean_text(raw_text[:sentence_end.start() + 1])
-                description = clean_text(raw_text[sentence_end.end() - 1:])
-            else:
-                # Just use whole text as title, fetch description from article page later
-                title = clean_text(raw_text)
-                description = ""
+        title_el = a.select_one("h3")
+        byline_el = a.select_one(".byline")
+        desc_el = a.select_one("div[class*='description']")
 
-        items.append((url, title, description))
+        if title_el:
+            raw_title = title_el.get_text(" ", strip=True)
+            byline = byline_el.get_text(" ", strip=True) if byline_el else ""
+            title = clean_text(f"{raw_title} {byline}".strip())
+            description = clean_text(desc_el.get_text(" ", strip=True)) if desc_el else ""
+        else:
+            # Fallback for older/unexpected markup where paper cards are plain text.
+            raw_text = a.get_text(" ", strip=True)
+
+            # Look for author citation pattern: "Name et al., YYYY"
+            match = re.search(r"\b\w+\s+et\s+al\.,?\s+\d{4}\b", raw_text)
+            if match:
+                split_pos = match.end()
+                title = clean_text(raw_text[:split_pos])
+                description = clean_text(raw_text[split_pos:])
+            else:
+                sentence_end = re.search(r"\.\s+[A-Z]", raw_text)
+                if sentence_end and sentence_end.start() < 150:
+                    title = clean_text(raw_text[: sentence_end.start() + 1])
+                    description = clean_text(raw_text[sentence_end.end() - 1 :])
+                else:
+                    title = clean_text(raw_text)
+                    description = ""
+
+        items.append((url, title, description, extract_homepage_month_datetime(a)))
 
     # Deduplicate while preserving order
     seen = set()
-    deduped: List[Tuple[str, str, str]] = []
-    for u, t, d in items:
+    deduped: List[FeedItem] = []
+    for u, t, d, homepage_dt in items:
         if u in seen:
             continue
         seen.add(u)
-        deduped.append((u, t, d))
+        deduped.append((u, t, d, homepage_dt))
 
     if MAX_ITEMS:
         deduped = deduped[:MAX_ITEMS]
@@ -282,7 +331,7 @@ def main() -> None:
     # Optional: collect entries to sort newest-first
     entries: List[Tuple[str, str, str, datetime]] = []
 
-    for (url, title, description) in items:
+    for (url, title, description, homepage_dt) in items:
         if not _allowed_host(url):
             continue
 
@@ -308,6 +357,9 @@ def main() -> None:
         if pub_dt is None:
             pub_dt = get_head_last_modified(url, session=session)
 
+        if pub_dt is None:
+            pub_dt = homepage_dt
+
         # Fallback to now (UTC)
         if pub_dt is None:
             pub_dt = datetime.now(timezone.utc)
@@ -319,7 +371,9 @@ def main() -> None:
     # Sort newest first (optional, but nice for readers)
     entries.sort(key=lambda x: x[3], reverse=True)
 
-    for url, title, description, pub_dt in entries:
+    # feedgen prepends entries internally, so insert oldest-first to produce
+    # newest-first XML output.
+    for url, title, description, pub_dt in reversed(entries):
         fe = fg.add_entry()
         fe.id(url)
         fe.link(href=url)

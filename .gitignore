@@ -1,1 +1,3 @@
 docs/index.xml
+.venv/
+__pycache__/
