@@ -7,7 +7,14 @@
     <docs>http://www.rssboard.org/rss-specification</docs>
     <generator>python-feedgen</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 04 May 2026 08:41:58 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 05 May 2026 08:27:16 +0000</lastBuildDate>
+    <item>
+      <title>HeadVis</title>
+      <link>https://transformer-circuits.pub/2026/headvis/index.html</link>
+      <description>We develop an interactive visualization tool to help us understand the behaviors of attention heads in language models.</description>
+      <guid isPermaLink="false">https://transformer-circuits.pub/2026/headvis/index.html</guid>
+      <pubDate>Mon, 04 May 2026 23:30:17 +0000</pubDate>
+    </item>
     <item>
       <title>Emotion Concepts and their Function in a Large Language Model Sofroniew et al., 2026</title>
       <link>https://transformer-circuits.pub/2026/emotions/index.html</link>
