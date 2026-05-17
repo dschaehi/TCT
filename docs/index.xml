@@ -7,7 +7,7 @@
     <docs>http://www.rssboard.org/rss-specification</docs>
     <generator>python-feedgen</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 16 May 2026 08:19:06 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 17 May 2026 08:32:36 +0000</lastBuildDate>
     <item>
       <title>Natural Language Autoencoders Produce Unsupervised Explanations of LLM Activations Fraser-Taliente, Kantamneni, Ong, et al., 2026</title>
       <link>https://transformer-circuits.pub/2026/nla/index.html</link>
